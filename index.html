@@ -24,7 +24,7 @@ const gap = 0;
 let fieldTilesWidth = 10;
 let fieldTilesHeight = 5;
 const colors = ["green", "red", "blue", "yellow", "magenta", "cyan"];
-let colorIndexSet = new Array(fieldTilesWidth * fieldTilesHeight);
+let fieldTiles = new Array(fieldTilesWidth * fieldTilesHeight);
 let activeTiles = fieldTilesHeight * fieldTilesWidth;
 let scores = 0;
 
@@ -42,14 +42,14 @@ function newGame() {
 	scores = 0;
 	activeTiles = fieldTilesHeight * fieldTilesWidth;
 	
-	colorIndexSet = new Array(fieldTilesWidth * fieldTilesHeight);
+	fieldTiles = new Array(fieldTilesWidth * fieldTilesHeight);
 	
 	field.width = fieldTilesWidth * (tileSize + gap);
 	field.height = fieldTilesHeight * (tileSize + gap);	
 
 	for(var i = 0; i < activeTiles; i++) {
 		var color = Math.floor(Math.random() * colors.length);
-		colorIndexSet[i] = color;
+		fieldTiles[i] = color;
 	}
 }
 
@@ -58,8 +58,8 @@ function draw() {
 	for(var y = 0; y < fieldTilesHeight; y++) {
 		for(var x = 0; x < fieldTilesWidth; x++) {
 			var index = (y * fieldTilesWidth) + x;
-			if(colorIndexSet[index] != -1) {
-				ctx.fillStyle = colors[colorIndexSet[index]];
+			if(fieldTiles[index] != -1) {
+				ctx.fillStyle = colors[fieldTiles[index]];
 				ctx.fillRect(gap + x * (tileSize + gap), gap + y * (tileSize + gap), tileSize, tileSize);
 			} else {
 				ctx.clearRect(gap + x * (tileSize + gap), gap + y * (tileSize + gap), tileSize, tileSize);
@@ -103,7 +103,7 @@ field.addEventListener("mousedown", function (event) {
 		var tileY = Math.floor((rawY - gap) / (tileSize + gap));
 		var click = (fieldTilesWidth * tileY) + tileX;
 
-		if(colorIndexSet[click] != -1) {
+		if(fieldTiles[click] != -1) {
 			var nearTiles = [click];
 
 			do {
@@ -130,7 +130,7 @@ field.addEventListener("mousedown", function (event) {
 					}
 
 					for(var d in directions) {
-						if((colorIndexSet[directions[d]] == colorIndexSet[index]) &&
+						if((fieldTiles[directions[d]] == fieldTiles[index]) &&
 							nearTiles.indexOf(directions[d]) == -1) {
 								nearTiles.push(directions[d]);
 								walk = true;
@@ -156,37 +156,37 @@ field.addEventListener("mousedown", function (event) {
 				for(var n in nearTiles) {
 					var iter = nearTiles[n];
 					for(var tempIter = iter; tempIter >= fieldTilesWidth; tempIter -= fieldTilesWidth) {
-						colorIndexSet[tempIter] = colorIndexSet[tempIter - fieldTilesWidth];
+						fieldTiles[tempIter] = fieldTiles[tempIter - fieldTilesWidth];
 					}
-					colorIndexSet[tempIter] = -1;
+					fieldTiles[tempIter] = -1;
 				}
 
-				for(let i = (fieldTilesHeight - 1) * fieldTilesWidth; i < colorIndexSet.length - 1; i++) {
-					if(colorIndexSet[i] == -1) {
+				for(let i = (fieldTilesHeight - 1) * fieldTilesWidth; i < fieldTiles.length - 1; i++) {
+					if(fieldTiles[i] == -1) {
 						for(let row = i; row >= 0; row -= fieldTilesWidth) {
 							let col;
 							for(col = row; col < Math.ceil(row / fieldTilesWidth) * fieldTilesWidth - 1; col++) {
-								colorIndexSet[col] = colorIndexSet[col + 1];
+								fieldTiles[col] = fieldTiles[col + 1];
 							}
-							colorIndexSet[col] = -1;
+							fieldTiles[col] = -1;
 						}
 					}
 				}
 
 				let gameOver = true;
 
-				for(let i = colorIndexSet.length - 1; i >= 0; i--) {
-					if(colorIndexSet[i] != -1) {
-						if(i >= fieldTilesWidth && colorIndexSet[i - fieldTilesWidth] == colorIndexSet[i]) {
+				for(let i = fieldTiles.length - 1; i >= 0; i--) {
+					if(fieldTiles[i] != -1) {
+						if(i >= fieldTilesWidth && fieldTiles[i - fieldTilesWidth] == fieldTiles[i]) {
 							gameOver = false; break;
 						}
-						if((i % fieldTilesWidth != fieldTilesWidth - 1) && colorIndexSet[i + 1] == colorIndexSet[i]) {
+						if((i % fieldTilesWidth != fieldTilesWidth - 1) && fieldTiles[i + 1] == fieldTiles[i]) {
 							gameOver = false; break;
 						}
-						if((Math.floor(i / fieldTilesWidth) != fieldTilesHeight - 1) && colorIndexSet[i + fieldTilesWidth] == colorIndexSet[i]) {
+						if((Math.floor(i / fieldTilesWidth) != fieldTilesHeight - 1) && fieldTiles[i + fieldTilesWidth] == fieldTiles[i]) {
 							gameOver = false; break;
 						}
-						if((i % fieldTilesWidth != 0) && colorIndexSet[i - 1] == colorIndexSet[i]) {
+						if((i % fieldTilesWidth != 0) && fieldTiles[i - 1] == fieldTiles[i]) {
 							gameOver = false; break;
 						}
 					}
